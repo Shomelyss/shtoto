@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeBlock Interpreter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+        }
+
+        .main-workspace {
+            display: grid;
+            grid-template-columns: 200px 1fr 250px;
+            gap: 20px;
+        }
+
+        /* Палитра блоков */
+        .block-palette {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            min-height: 500px;
+        }
+
+        .blocks-container {
+            margin-top: 10px;
+            min-height: 400px;
+            border: 2px dashed #ccc;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 10px;
+        }
+
+        /* Рабочая область */
+        .workspace {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            min-height: 500px;
+        }
+
+        .drop-zone {
+            min-height: 450px;
+            border: 2px dashed #ccc;
+            padding: 10px;
+        }
+
+        /* Панель вывода */
+        .output-panel {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            min-height: 500px;
+        }
+
+        .output-area {
+            background-color: #f5f5f5;
+            padding: 10px;
+            min-height: 200px;
+            border: 1px solid #ddd;
+            font-family: monospace;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+
+        .errors-area {
+            background-color: #ffebee;
+            padding: 10px;
+            min-height: 200px;
+            border: 1px solid #ef9a9a;
+            color: #c62828;
+            font-size: 12px;
+        }
+
+        h4 {
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h2>CodeBlock Interpreter</h2>
+        </header>
+        
+        <div class="main-workspace">
+            <!-- Палитра блоков -->
+            <div class="block-palette">
+                <h4>Блоки</h4>
+                <div class="blocks-container">
+                    <!-- Сюда будут добавляться блоки -->
+                </div>
+            </div>
+            
+            <!-- Рабочая область -->
+            <div class="workspace">
+                <h4>Рабочая область</h4>
+                <div class="drop-zone">
+                    <!-- Сюда будут перетаскиваться блоки -->
+                </div>
+            </div>
+            
+            <!-- Панель вывода -->
+            <div class="output-panel">
+                <h4>Вывод</h4>
+                <div class="output-area"></div>
+                
+                <h4>Ошибки</h4>
+                <div class="errors-area"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
