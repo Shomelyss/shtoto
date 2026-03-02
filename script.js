@@ -232,6 +232,35 @@ class UIManager {
 
             const newBlock = wrapper.firstElementChild;
             newBlock.classList.add("workspace-block");
+
+if (newBlock.dataset.type === "if") {
+    const inner = document.createElement("div");
+    inner.classList.add("inner-drop");
+    inner.style.marginLeft = "20px";
+    inner.style.borderLeft = "3px solid gray";
+    inner.style.paddingLeft = "10px";
+    inner.style.marginTop = "5px";
+    inner.textContent = "Перетащите сюда вложенные блоки";
+
+    newBlock.appendChild(inner);
+
+    inner.addEventListener("dragover", e => e.preventDefault());
+
+    inner.addEventListener("drop", e => {
+        e.preventDefault();
+
+        const html = e.dataTransfer.getData("text/plain");
+        const wrapper = document.createElement("div");
+        wrapper.innerHTML = html;
+
+        const childBlock = wrapper.firstElementChild;
+        childBlock.classList.add("workspace-block");
+        childBlock.draggable = false;
+
+        inner.appendChild(childBlock);
+    });
+}
+
             newBlock.draggable = false;
 
             this.dropZone.appendChild(newBlock);
@@ -281,4 +310,5 @@ class UIManager {
 
 document.addEventListener("DOMContentLoaded", () => {
     new UIManager();
+
 });
