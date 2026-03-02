@@ -160,3 +160,19 @@ pre {
         width: 95%;
     }
 }
+
+
+.inner-drop {
+    min-height: 30px;
+    background-color: #f9f9f9;
+    border: 2px dashed #aaa;
+    border-radius: 4px;
+    padding: 5px;
+}
+
+.inner-drop:empty::before {
+    content: "Перетащите сюда вложенные блоки";
+    color: #888;
+    font-style: italic;
+    font-size: 12px;
+}

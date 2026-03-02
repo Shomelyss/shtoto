@@ -12,6 +12,8 @@ class Variable {
 // Интерпретатор
 // ==========================
 class Interpreter {
+
+
     constructor() {
         this.variables = {};
         this.output = [];
@@ -187,6 +189,42 @@ class Interpreter {
     
         throw new Error("Неизвестный токен: " + token);
     }
+
+
+    handleIf(el) {
+    const leftInput = el.querySelectorAll("input")[0];
+    const operator = el.querySelector("select").value;
+    const rightInput = el.querySelectorAll("input")[1];
+
+    const leftValue = this.evaluateExpression(leftInput.value);
+    const rightValue = this.evaluateExpression(rightInput.value);
+
+    let condition = false;
+
+    switch (operator) {
+        case ">": condition = leftValue > rightValue; break;
+        case "<": condition = leftValue < rightValue; break;
+        case "==": condition = leftValue === rightValue; break;
+        case "!=": condition = leftValue !== rightValue; break;
+        case ">=": condition = leftValue >= rightValue; break;
+        case "<=": condition = leftValue <= rightValue; break;
+        default:
+            throw new Error("Неизвестный оператор сравнения");
+    }
+
+    if (condition) {
+        const inner = el.querySelector(".inner-drop");
+        if (!inner) return;
+
+        const childBlocks = Array.from(inner.children)
+            .filter(c => c.classList.contains("workspace-block"));
+
+        for (let child of childBlocks) {
+            this.executeBlock({ element: child });
+        }
+    }
+}
+
 }
 
 // ==========================
@@ -236,14 +274,9 @@ class UIManager {
             const newBlock = wrapper.firstElementChild;
             newBlock.classList.add("workspace-block");
 
-if (newBlock.dataset.type === "if") {
+    if (newBlock.dataset.type === "if") {
     const inner = document.createElement("div");
     inner.classList.add("inner-drop");
-    inner.style.marginLeft = "20px";
-    inner.style.borderLeft = "3px solid gray";
-    inner.style.paddingLeft = "10px";
-    inner.style.marginTop = "5px";
-    inner.textContent = "Перетащите сюда вложенные блоки";
 
     newBlock.appendChild(inner);
 
@@ -251,6 +284,7 @@ if (newBlock.dataset.type === "if") {
 
     inner.addEventListener("drop", e => {
         e.preventDefault();
+        e.stopPropagation();
 
         const html = e.dataTransfer.getData("text/plain");
         const wrapper = document.createElement("div");
@@ -262,6 +296,7 @@ if (newBlock.dataset.type === "if") {
 
         inner.appendChild(childBlock);
     });
+
 }
 
             newBlock.draggable = false;
