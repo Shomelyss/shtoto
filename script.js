@@ -54,9 +54,12 @@ class Interpreter {
             this.handleDeclaration(el);
         } else if (type === "assign") {
             this.handleAssignment(el);
-        } else {
+        }
+        else if (type === "if") { this.handleIf(el);}
+        else {
             throw new Error("Неизвестный тип блока");
         }
+        
     }
 
     handleDeclaration(el) {
