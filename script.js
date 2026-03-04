@@ -169,27 +169,31 @@ class Interpreter {
     }
 
     parsePrimary(tokens) {
-        const token = tokens.shift();
-        if (!token) throw new Error("Неверное выражение");
-    
-        if (token === "(") {
-            const value = this.parseAddSub(tokens);
-    
-            if (tokens[0] !== ")") {
-                throw new Error("Ожидалась закрывающая скобка");
-            }
-    
-            tokens.shift();
-            return value;
-        }
-    
-        if (!isNaN(token)) return parseInt(token);
-    
-        if (this.variables[token]) return this.variables[token].value;
-    
-        throw new Error("Неизвестный токен: " + token);
+    const token = tokens.shift();
+    if (!token) throw new Error("Неверное выражение");
+
+    if (token === "-") {
+        const value = this.parsePrimary(tokens);
+        return -value;
     }
 
+    if (token === "(") {
+        const value = this.parseAddSub(tokens);
+
+        if (tokens[0] !== ")") {
+            throw new Error("Ожидалась закрывающая скобка");
+        }
+
+        tokens.shift();
+        return value;
+    }
+
+    if (!isNaN(token)) return parseInt(token);
+
+    if (this.variables[token]) return this.variables[token].value;
+
+    throw new Error("Неизвестный токен: " + token);
+}
 
     handleIf(el) {
     const leftInput = el.querySelectorAll("input")[0];
