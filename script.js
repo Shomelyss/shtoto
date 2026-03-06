@@ -277,6 +277,16 @@ class UIManager {
 
             const newBlock = wrapper.firstElementChild;
             newBlock.classList.add("workspace-block");
+            const deleteBtn = document.createElement("span");
+            deleteBtn.textContent = "✖";
+            deleteBtn.classList.add("delete-btn");
+
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                newBlock.remove();
+            };
+
+            newBlock.appendChild(deleteBtn);
 
     if (newBlock.dataset.type === "if") {
     const inner = document.createElement("div");
