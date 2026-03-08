@@ -58,6 +58,9 @@ class Interpreter {
             this.handleAssignment(el);
         }
         else if (type === "if") { this.handleIf(el);}
+        else if (type === "else") {
+    return;
+}
         else {
             throw new Error("Неизвестный тип блока");
         }
@@ -196,6 +199,7 @@ class Interpreter {
 }
 
     handleIf(el) {
+
     const leftInput = el.querySelectorAll("input")[0];
     const operator = el.querySelector("select").value;
     const rightInput = el.querySelectorAll("input")[1];
@@ -216,16 +220,22 @@ class Interpreter {
             throw new Error("Неизвестный оператор сравнения");
     }
 
-    if (condition) {
-        const inner = el.querySelector(".inner-drop");
-        if (!inner) return;
+    const thenBlock = el.querySelector(".inner-drop");
 
-        const childBlocks = Array.from(inner.children)
-            .filter(c => c.classList.contains("workspace-block"));
+    const elseBlock = el.nextElementSibling &&
+                      el.nextElementSibling.dataset.type === "else"
+        ? el.nextElementSibling.querySelector(".inner-drop")
+        : null;
 
-        for (let child of childBlocks) {
-            this.executeBlock({ element: child });
-        }
+    const target = condition ? thenBlock : elseBlock;
+
+    if (!target) return;
+
+    const childBlocks = Array.from(target.children)
+        .filter(c => c.classList.contains("workspace-block"));
+
+    for (let child of childBlocks) {
+        this.executeBlock({ element: child });
     }
 }
 
@@ -288,7 +298,8 @@ class UIManager {
 
             newBlock.appendChild(deleteBtn);
 
-    if (newBlock.dataset.type === "if") {
+    if (newBlock.dataset.type === "if" || newBlock.dataset.type === "else") {
+
     const inner = document.createElement("div");
     inner.classList.add("inner-drop");
 
@@ -297,10 +308,12 @@ class UIManager {
     inner.addEventListener("dragover", e => e.preventDefault());
 
     inner.addEventListener("drop", e => {
+
         e.preventDefault();
         e.stopPropagation();
 
         const html = e.dataTransfer.getData("text/plain");
+
         const wrapper = document.createElement("div");
         wrapper.innerHTML = html;
 
@@ -309,8 +322,8 @@ class UIManager {
         childBlock.draggable = false;
 
         inner.appendChild(childBlock);
-    });
 
+    });
 }
 
             newBlock.draggable = false;
