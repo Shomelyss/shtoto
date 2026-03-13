@@ -13,7 +13,6 @@ class Variable {
 // ==========================
 class Interpreter {
 
-
     constructor() {
         this.variables = {};
         this.output = [];
@@ -54,26 +53,30 @@ class Interpreter {
 
         if (type === "var") {
             this.handleDeclaration(el);
-        } else if (type === "assign") {
+        } 
+        else if (type === "assign") {
             this.handleAssignment(el);
         }
-        else if (type === "if") { this.handleIf(el);}
+        else if (type === "if") {
+            this.handleIf(el);
+        }
         else if (type === "else") {
-    return;
-}
+            return;
+        }
         else {
             throw new Error("Неизвестный тип блока");
         }
-        
     }
 
     handleDeclaration(el) {
+
         const input = el.querySelector("input");
         if (!input) throw new Error("Ошибка объявления");
 
         const names = input.value.split(",").map(n => n.trim());
 
         names.forEach(name => {
+
             if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(name)) {
                 throw new Error("Некорректное имя: " + name);
             }
@@ -89,6 +92,7 @@ class Interpreter {
     }
 
     handleAssignment(el) {
+
         const inputs = el.querySelectorAll("input");
         if (inputs.length < 2) throw new Error("Ошибка присваивания");
 
@@ -100,50 +104,67 @@ class Interpreter {
         }
 
         const value = this.evaluateExpression(expr);
+
         this.variables[name].value = value;
 
         this.output.push(name + " = " + value);
     }
 
-    // ===== Разбор выражений =====
+    // ==========================
+    // Разбор выражений
+    // ==========================
 
     evaluateExpression(expr) {
+
         const tokens = this.tokenize(expr);
+
         const result = this.parseAddSub(tokens);
-    
+
         if (tokens.length > 0) {
             throw new Error("Лишние символы в выражении");
         }
-    
+
         return result;
     }
 
     tokenize(expr) {
+
         const tokens = [];
+
         let buffer = "";
 
         for (let ch of expr) {
+
             if ("+-*/%()".includes(ch)) {
+
                 if (buffer) {
                     tokens.push(buffer);
                     buffer = "";
                 }
+
                 tokens.push(ch);
-            } else if (ch !== " ") {
+
+            } 
+            else if (ch !== " ") {
                 buffer += ch;
             }
         }
 
         if (buffer) tokens.push(buffer);
+
         return tokens;
     }
 
     parseAddSub(tokens) {
+
         let value = this.parseMulDiv(tokens);
 
         while (tokens[0] === "+" || tokens[0] === "-") {
+
             const op = tokens.shift();
+
             const right = this.parseMulDiv(tokens);
+
             value = op === "+" ? value + right : value - right;
         }
 
@@ -151,19 +172,28 @@ class Interpreter {
     }
 
     parseMulDiv(tokens) {
+
         let value = this.parsePrimary(tokens);
 
         while (["*", "/", "%"].includes(tokens[0])) {
+
             const op = tokens.shift();
+
             const right = this.parsePrimary(tokens);
 
             if (op === "*") value *= right;
+
             else if (op === "/") {
+
                 if (right === 0) throw new Error("Деление на 0");
+
                 value = Math.floor(value / right);
             }
+
             else if (op === "%") {
+
                 if (right === 0) throw new Error("Деление на 0");
+
                 value %= right;
             }
         }
@@ -172,161 +202,209 @@ class Interpreter {
     }
 
     parsePrimary(tokens) {
-    const token = tokens.shift();
-    if (!token) throw new Error("Неверное выражение");
 
-    if (token === "-") {
-        const value = this.parsePrimary(tokens);
-        return -value;
-    }
+        const token = tokens.shift();
 
-    if (token === "(") {
-        const value = this.parseAddSub(tokens);
+        if (!token) throw new Error("Неверное выражение");
 
-        if (tokens[0] !== ")") {
-            throw new Error("Ожидалась закрывающая скобка");
+        if (token === "-") {
+
+            const value = this.parsePrimary(tokens);
+
+            return -value;
         }
 
-        tokens.shift();
-        return value;
+        if (token === "(") {
+
+            const value = this.parseAddSub(tokens);
+
+            if (tokens[0] !== ")") {
+                throw new Error("Ожидалась закрывающая скобка");
+            }
+
+            tokens.shift();
+
+            return value;
+        }
+
+        if (!isNaN(token)) return parseInt(token);
+
+        if (this.variables[token]) return this.variables[token].value;
+
+        throw new Error("Неизвестный токен: " + token);
     }
 
-    if (!isNaN(token)) return parseInt(token);
-
-    if (this.variables[token]) return this.variables[token].value;
-
-    throw new Error("Неизвестный токен: " + token);
-}
+    // ==========================
+    // IF
+    // ==========================
 
     handleIf(el) {
 
-    const leftInput = el.querySelectorAll("input")[0];
-    const operator = el.querySelector("select").value;
-    const rightInput = el.querySelectorAll("input")[1];
+        const leftInput = el.querySelectorAll("input")[0];
 
-    const leftValue = this.evaluateExpression(leftInput.value);
-    const rightValue = this.evaluateExpression(rightInput.value);
+        const operator = el.querySelector("select").value;
 
-    let condition = false;
+        const rightInput = el.querySelectorAll("input")[1];
 
-    switch (operator) {
-        case ">": condition = leftValue > rightValue; break;
-        case "<": condition = leftValue < rightValue; break;
-        case "==": condition = leftValue === rightValue; break;
-        case "!=": condition = leftValue !== rightValue; break;
-        case ">=": condition = leftValue >= rightValue; break;
-        case "<=": condition = leftValue <= rightValue; break;
-        default:
-            throw new Error("Неизвестный оператор сравнения");
+        const leftValue = this.evaluateExpression(leftInput.value);
+
+        const rightValue = this.evaluateExpression(rightInput.value);
+
+        let condition = false;
+
+        switch (operator) {
+
+            case ">": condition = leftValue > rightValue; break;
+            case "<": condition = leftValue < rightValue; break;
+            case "==": condition = leftValue === rightValue; break;
+            case "!=": condition = leftValue !== rightValue; break;
+            case ">=": condition = leftValue >= rightValue; break;
+            case "<=": condition = leftValue <= rightValue; break;
+
+            default:
+                throw new Error("Неизвестный оператор сравнения");
+        }
+
+        const thenBlock = el.querySelector(".inner-drop");
+
+        const elseBlock =
+            el.nextElementSibling &&
+            el.nextElementSibling.dataset.type === "else"
+                ? el.nextElementSibling.querySelector(".inner-drop")
+                : null;
+
+        const target = condition ? thenBlock : elseBlock;
+
+        if (!target) return;
+
+        const childBlocks = Array.from(target.children)
+            .filter(c => c.classList.contains("workspace-block"));
+
+        for (let child of childBlocks) {
+
+            this.executeBlock({ element: child });
+        }
     }
-
-    const thenBlock = el.querySelector(".inner-drop");
-
-    const elseBlock = el.nextElementSibling &&
-                      el.nextElementSibling.dataset.type === "else"
-        ? el.nextElementSibling.querySelector(".inner-drop")
-        : null;
-
-    const target = condition ? thenBlock : elseBlock;
-
-    if (!target) return;
-
-    const childBlocks = Array.from(target.children)
-        .filter(c => c.classList.contains("workspace-block"));
-
-    for (let child of childBlocks) {
-        this.executeBlock({ element: child });
-    }
-}
-
 }
 
 // ==========================
 // UI
 // ==========================
 class UIManager {
+
     constructor() {
+
         this.dropZone = document.getElementById("dropZone");
+
         this.runBtn = document.getElementById("run");
+
         this.clearBtn = document.getElementById("clear");
+
         this.output = document.getElementById("output");
+
         this.varsArea = document.getElementById("vars");
+
         this.errors = document.getElementById("errors");
 
         this.blocks = [];
+
         this.interpreter = new Interpreter();
 
         this.init();
     }
 
     init() {
+
         this.setupDragAndDrop();
+
         this.runBtn.onclick = () => this.run();
+
         this.clearBtn.onclick = () => this.clear();
     }
 
+    // ==========================
+    // СОЗДАНИЕ БЛОКА (РЕКУРСИЯ)
+    // ==========================
+
+    createWorkspaceBlock(html) {
+
+        const wrapper = document.createElement("div");
+
+        wrapper.innerHTML = html;
+
+        const newBlock = wrapper.firstElementChild;
+
+        newBlock.classList.add("workspace-block");
+
+        newBlock.draggable = false;
+
+        const deleteBtn = document.createElement("span");
+
+        deleteBtn.textContent = "✖";
+
+        deleteBtn.classList.add("delete-btn");
+
+        deleteBtn.onclick = (e) => {
+
+            e.stopPropagation();
+
+            newBlock.remove();
+        };
+
+        newBlock.appendChild(deleteBtn);
+
+        if (newBlock.dataset.type === "if" || newBlock.dataset.type === "else") {
+
+            const inner = document.createElement("div");
+
+            inner.classList.add("inner-drop");
+
+            newBlock.appendChild(inner);
+
+            inner.addEventListener("dragover", e => e.preventDefault());
+
+            inner.addEventListener("drop", e => {
+
+                e.preventDefault();
+
+                e.stopPropagation();
+
+                const html = e.dataTransfer.getData("text/plain");
+
+                const childBlock = this.createWorkspaceBlock(html);
+
+                inner.appendChild(childBlock);
+            });
+        }
+
+        return newBlock;
+    }
+
+    // ==========================
+    // DRAG & DROP
+    // ==========================
+
     setupDragAndDrop() {
+
         const paletteBlocks = document.querySelectorAll(".block");
 
         paletteBlocks.forEach(block => {
+
             block.addEventListener("dragstart", e => {
+
                 e.dataTransfer.setData("text/plain", block.outerHTML);
             });
         });
 
-        this.dropZone.addEventListener("dragover", e => {
-            e.preventDefault();
-        });
+        this.dropZone.addEventListener("dragover", e => e.preventDefault());
 
         this.dropZone.addEventListener("drop", e => {
+
             e.preventDefault();
 
             const html = e.dataTransfer.getData("text/plain");
-            const wrapper = document.createElement("div");
-            wrapper.innerHTML = html;
 
-            const newBlock = wrapper.firstElementChild;
-            newBlock.classList.add("workspace-block");
-            const deleteBtn = document.createElement("span");
-            deleteBtn.textContent = "✖";
-            deleteBtn.classList.add("delete-btn");
-
-            deleteBtn.onclick = (e) => {
-                e.stopPropagation();
-                newBlock.remove();
-            };
-
-            newBlock.appendChild(deleteBtn);
-
-    if (newBlock.dataset.type === "if" || newBlock.dataset.type === "else") {
-
-    const inner = document.createElement("div");
-    inner.classList.add("inner-drop");
-
-    newBlock.appendChild(inner);
-
-    inner.addEventListener("dragover", e => e.preventDefault());
-
-    inner.addEventListener("drop", e => {
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        const html = e.dataTransfer.getData("text/plain");
-
-        const wrapper = document.createElement("div");
-        wrapper.innerHTML = html;
-
-        const childBlock = wrapper.firstElementChild;
-        childBlock.classList.add("workspace-block");
-        childBlock.draggable = false;
-
-        inner.appendChild(childBlock);
-
-    });
-}
-
-            newBlock.draggable = false;
+            const newBlock = this.createWorkspaceBlock(html);
 
             this.dropZone.appendChild(newBlock);
 
@@ -336,44 +414,68 @@ class UIManager {
         });
     }
 
+    // ==========================
+    // RUN
+    // ==========================
+
     run() {
+
         this.errors.textContent = "";
+
         this.blocks.forEach(b => b.element.classList.remove("error"));
 
         if (this.blocks.length === 0) {
+
             this.errors.textContent = "Нет блоков для выполнения";
+
             return;
         }
 
         const result = this.interpreter.execute(this.blocks);
 
         if (!result.success) {
+
             this.errors.textContent = result.error;
+
             result.errorBlock.classList.add("error");
         }
 
         this.output.textContent = result.output.join("\n");
 
         const vars = {};
+
         for (let key in result.variables) {
+
             vars[key] = result.variables[key].value;
         }
 
         this.varsArea.textContent = JSON.stringify(vars, null, 2);
     }
 
+    // ==========================
+    // CLEAR
+    // ==========================
+
     clear() {
+
         this.dropZone.innerHTML =
             '<p class="placeholder">Сюда нужно перетаскивать блоки</p>';
 
         this.blocks = [];
+
         this.output.textContent = "";
+
         this.varsArea.textContent = "{}";
+
         this.errors.textContent = "";
     }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    new UIManager();
+// ==========================
+// START
+// ==========================
 
+document.addEventListener("DOMContentLoaded", () => {
+
+    new UIManager();
 });

@@ -26,12 +26,12 @@ h1 {
     gap: 15px;
 }
 
-
 .left {
     width: 250px;
     background: white;
     padding: 10px;
     border-radius: 6px;
+    flex-shrink: 0;
 }
 
 .block {
@@ -53,12 +53,12 @@ h1 {
     border-radius: 3px;
 }
 
-
 .center {
     flex: 1;
     background: white;
     padding: 10px;
     border-radius: 6px;
+    min-width: 0;
 }
 
 .drop {
@@ -74,6 +74,8 @@ h1 {
     display: flex;
     gap: 5px;
     align-items: center;
+    width: 100%;
+    min-width: fit-content;
 }
 
 .block[data-type="var"],
@@ -88,12 +90,12 @@ h1 {
     color: white;
 }
 
-
 .workspace-block input {
     width: 90px;
     padding: 2px;
     border: none;
     border-radius: 3px;
+    min-width: 60px;
 }
 
 .error {
@@ -105,6 +107,7 @@ h1 {
     background: white;
     padding: 10px;
     border-radius: 6px;
+    flex-shrink: 0;
 }
 
 button {
@@ -148,33 +151,52 @@ pre {
     margin-top: 10px;
 }
 
-/* Адаптив */
-@media (max-width: 800px) {
-    .main {
-        flex-direction: column;
-    }
-
-    .container {
-        width: 95%;
-    }
+.workspace-block[data-type="if"],
+.workspace-block[data-type="else"] {
+    flex-direction: column;
+    align-items: stretch;
+    min-width: 300px;
+    width: 100%;
 }
 
+.workspace-block[data-type="if"] > div:first-of-type,
+.workspace-block[data-type="else"] > div:first-of-type {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
 
 .inner-drop {
-    min-height: 30px;
-    background-color: #f9f9f9;
-    border: 2px dashed #aaa;
+    min-height: 40px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 2px dashed rgba(255, 255, 255, 0.5);
     border-radius: 4px;
-    padding: 5px;
+    padding: 8px;
+    margin-top: 8px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .inner-drop:empty::before {
-    content: "Перетащите сюда вложенные блоки";
-    color: #888;
+    content: "Перетащите сюда блоки";
+    color: rgba(255, 255, 255, 0.7);
     font-style: italic;
     font-size: 12px;
 }
 
+.inner-drop .workspace-block {
+    margin-bottom: 0;
+    width: 100%;
+}
+
+.inner-drop .workspace-block[data-type="if"],
+.inner-drop .workspace-block[data-type="else"] {
+    min-width: 280px;
+}
 
 .delete-btn {
     margin-left: auto;
@@ -184,8 +206,18 @@ pre {
     background: rgba(0,0,0,0.3);
     padding: 2px 6px;
     border-radius: 3px;
+    flex-shrink: 0;
 }
 
 .delete-btn:hover {
     background: rgba(0,0,0,0.6);
+}
+
+@media (max-width: 800px) {
+    .main {
+        flex-direction: column;
+    }
+    .container {
+        width: 95%;
+    }
 }
